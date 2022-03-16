@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import "antd/dist/antd.css";
 import { AgGridReact } from "ag-grid-react";
@@ -8,22 +9,40 @@ import { render } from "react-dom";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 
+interface gridValues {
+  username: string;
+  password: string;
+}
+
 function App() {
   const [rowData, setRowData] = useState([
-    { id: "1", username: "John", password: "123" },
-    { id: "2", username: "Felper", password: "123456" },
-    { id: "3", username: "João", password: "123456" },
+    { username: "John", password: "123" },
+    { username: "Felper", password: "123456" },
   ]);
 
   const [columnDefs] = useState([
-    { field: "id", sorteable: true },
-    { field: "username", sorteable: true, filter: true },
-    { field: "password", sorteable: true },
+    { field: "username", filter: true, width: 200 },
+    { field: "password", width: 200 },
   ]);
 
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
-    setRowData([...rowData, values]);
+  const defaultColDef = {
+    // set every column width
+    // width: 200,
+    // make every column editable
+    editable: true,
+    // make every column use 'text' filter by default
+    filter: "agTextColumnFilter",
+    resizable: true,
+  };
+
+  const onFinish = (Felper: gridValues) => {
+    const inventory = [...rowData];
+
+    function hasUser(Usuarios: gridValues) {
+      return Felper.username === "Felper" && Felper.password === "123456";
+    }
+    // console.log(inventory.find(isCherries));
+    console.log(inventory.find(hasUser));
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -39,7 +58,7 @@ function App() {
           name="basic"
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 12 }}
-          initialValues={{ remember: true }}
+          initialValues={{ remember: false }}
           autoComplete="off"
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
@@ -62,13 +81,13 @@ function App() {
             <Input.Password />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             name="remember"
             valuePropName="checked"
             wrapperCol={{ offset: 6, span: 12 }}
           >
             <Checkbox>Remember me</Checkbox>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
             <Button type="primary" htmlType="submit">
@@ -82,7 +101,11 @@ function App() {
           className="ag-theme-alpine"
           style={{ height: 400, width: 650, margin: `auto` }}
         >
-          <AgGridReact rowData={rowData} columnDefs={columnDefs} />
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+          />
         </div>
       </div>
     </>
