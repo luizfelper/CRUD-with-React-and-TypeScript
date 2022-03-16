@@ -2,9 +2,16 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import "antd/dist/antd.css";
 import { AgGridReact } from "ag-grid-react";
-import { Button, Checkbox, Form, Input } from "antd";
-import React, { useState } from "react";
-import { render } from "react-dom";
+import { Formik, useFormik } from "formik";
+import {
+  Form,
+  Input,
+  InputNumber,
+  Checkbox,
+  SubmitButton,
+  ResetButton,
+} from "formik-antd";
+import { useEffect, useState } from "react";
 
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
@@ -15,16 +22,11 @@ interface gridValues {
 }
 
 function App() {
-  const [rowData, setRowData] = useState([
-    { username: "John", password: "123" },
-    { username: "Felper", password: "123456" },
-  ]);
-
+  const [rowData, setRowData] = useState([]);
   const [columnDefs] = useState([
     { field: "username", filter: true, width: 200 },
-    { field: "password", width: 200 },
+    { field: "email", width: 200 },
   ]);
-
   const defaultColDef = {
     // set every column width
     // width: 200,
@@ -35,66 +37,39 @@ function App() {
     resizable: true,
   };
 
-  const onFinish = (Felper: gridValues) => {
-    const inventory = [...rowData];
+  useEffect(() => {
+    console.log("rowData", rowData);
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then(function (respostaDaPagina) {
+        return respostaDaPagina.json();
+      })
+      .then(function (respostaDaPaginaCompleta) {
+        setRowData(respostaDaPaginaCompleta);
+      });
+  }, []);
 
-    function hasUser(Usuarios: gridValues) {
-      return Felper.username === "Felper" && Felper.password === "123456";
-    }
-    // console.log(inventory.find(isCherries));
-    console.log(inventory.find(hasUser));
+  const handleSubmit = (values: any) => {
+    alert(JSON.stringify(values, null, 2));
   };
-
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-  };
-
-  const [comentarios, setComentarios] = useState([]);
 
   return (
     <>
       <header>
-        <Form
-          name="basic"
-          labelCol={{ span: 6 }}
-          wrapperCol={{ span: 12 }}
-          initialValues={{ remember: false }}
-          autoComplete="off"
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-        >
-          <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-            <h1>CRUD using Formik, Antd, Ag-Grid and Typescript</h1>
-          </Form.Item>
-          <Form.Item
-            label="Username"
-            name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
-          >
-            <Input.Password />
-          </Form.Item>
-
-          {/* <Form.Item
-            name="remember"
-            valuePropName="checked"
-            wrapperCol={{ offset: 6, span: 12 }}
-          >
-            <Checkbox>Remember me</Checkbox>
-          </Form.Item> */}
-
-          <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
+        <Formik
+          initialValues={{ firstName: "", age: 20, newsletter: false }}
+          render={() => (
+            <Form>
+              {/* every formik-antd component must have the 'name' prop set: */}
+              <Input name="firstName" placeholder="First Name" />
+              {/* the rest of the api stays as is */}
+              <InputNumber name="age" min={0} />
+              <Checkbox name="newsletter">Newsletter</Checkbox>
+              <SubmitButton>Enviar</SubmitButton>
+              <ResetButton>Limpar</ResetButton>
+            </Form>
+          )}
+          onSubmit={handleSubmit}
+        />
       </header>
       <div className="Content">
         <div
